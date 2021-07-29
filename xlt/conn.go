@@ -74,6 +74,7 @@ func (c *conn) serve() {
 		req, err := c.readRequest()
 		if err != nil {
 			log.Printf("[readRequest] failed. err:%v\n", err)
+			break
 		}
 
 		res := c.setupResponse()

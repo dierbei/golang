@@ -9,15 +9,15 @@ import (
 )
 
 // 对于HTTP协议来说，一个请求报文分为三部分：请求行、首部字段以及报文主体，一个post请求的报文如下：
-// POST / HTTP/1.1\r\n						   	#请求行
-// Content-Type: text/plain\r\n				    #2~7行首部字段，首部字段为k-v对
+// POST / HTTP/1.1\r\n						   	# 请求行
+// Content-Type: text/plain\r\n				    # 2~7 请求头, 键值
 // User-Agent: PostmanRuntime/7.28.0\r\n
 // Host: 127.0.0.1:8080\r\n
 // Accept-Encoding: gzip, deflate, br\r\n
 // Connection: keep-alive\r\n
 // Content-Length: 18\r\n
 // \r\n
-// hello,I am client!							#报文主体
+// hello,I am client!							# 请求体
 
 // 其中首部字段部分是由一个个key-value对组成，每一对之间通过\r\n分割
 // 首部字段与报文主体之间则是利用空行(CR+LF)即\r\n\r\n作为分界
@@ -88,16 +88,18 @@ func (c *conn) serve() {
 	}
 }
 
+// Close close tcp connect
 func (c *conn) Close() {
 	if err := c.rwc.Close(); err != nil {
 		log.Printf("Close conn failed, err:%v\n", err)
 	}
 }
 
+// readRequest according conn get request
 func (c *conn) readRequest() (*Request, error) {
 	return readRequest(c)
 }
 
 func (c *conn) setupResponse() *response {
-	return nil
+	return setupResponse(c)
 }

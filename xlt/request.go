@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/url"
 	"strings"
 )
@@ -35,21 +36,21 @@ func readRequest(c *conn) (*Request, error) {
 		return r, err
 	}
 
-	fmt.Printf("line data: [%s]\n", string(line))
+	log.Printf("line data: [%s]\n", string(line))
 	n, err := fmt.Sscanf(string(line), "%s%s%s", &r.Method, &r.RequestURI, &r.Proto)
 	if err != nil {
 		return r, err
 	}
-	fmt.Printf("n: [%d], method: [%s],  requesturi: [%s], proto: [%s]\n", n, r.Method, r.RequestURI, r.Proto)
+	log.Printf("n: [%d], method: [%s],  requesturi: [%s], proto: [%s]\n", n, r.Method, r.RequestURI, r.Proto)
 
 	r.Url, err = url.ParseRequestURI(r.RequestURI)
 	if err != nil {
 		return r, err
 	}
-	fmt.Printf("parse_request_url:[%+v]\n", r.Url)
+	log.Printf("parse_request_url:[%+v]\n", r.Url)
 
 	r.parseQuery()
-	fmt.Printf("parse_query:[%+v]\n", r.queryString)
+	log.Printf("parse_query:[%+v]\n", r.queryString)
 
 	r.Header, err = readHeader(c.bufr)
 	if err != nil {
@@ -63,8 +64,7 @@ func readRequest(c *conn) (*Request, error) {
 	return r, nil
 }
 
-// parseQuery example: 127.0.0.1?name=xlt&token=12345
-// name=xlt&token=12345 转换为map存储
+//parseQuery example: 127.0.0.1?name=xlt&token=12345
 func (r *Request) parseQuery() {
 	r.queryString = parseQuery(r.Url.RawQuery)
 }
@@ -81,6 +81,7 @@ func (r *Request) Query(name string) string {
 	return r.cookies[name]
 }
 
+//parseCookies 解析请求头中的Cookie
 func (r *Request) parseCookies() {
 	if r.cookies != nil {
 		return
@@ -114,8 +115,8 @@ func (r *Request) parseCookies() {
 	return
 }
 
-// readLine 读取一行数据
-// isPrefix 如果为真，代表请求头太大还没读完需要继续
+//readLine 读取一行数据
+//isPrefix 如果为true，代表请求头还没读完需要继续
 func readLine(bufr *bufio.Reader) ([]byte, error) {
 	data, isPrefix, err := bufr.ReadLine()
 	if err != nil {
@@ -134,6 +135,7 @@ func readLine(bufr *bufio.Reader) ([]byte, error) {
 	return data, err
 }
 
+//RawQuery example: name=xlt&token=12345
 func parseQuery(RawQuery string) map[string]string {
 	// 以 & 符号分隔得到查询键值对
 	parts := strings.Split(RawQuery, "&")
@@ -151,8 +153,7 @@ func parseQuery(RawQuery string) map[string]string {
 	return queries
 }
 
-// readHeader 读取请求头数据
-// 以 : 符号分割键值对存储
+//readHeader 读取请求头数据
 func readHeader(bufr *bufio.Reader) (Header, error) {
 	header := Header{}
 
@@ -168,6 +169,7 @@ func readHeader(bufr *bufio.Reader) (Header, error) {
 			break
 		}
 
+		//以 ":" 符号分割键值对存储
 		index := bytes.IndexByte(line, ':')
 		if index == -1 {
 			return nil, errors.New("unsupported protocol")

@@ -83,8 +83,9 @@ func (c *conn) serve() {
 
 		// 请求数据都写入bufw，缓存默认大小为4k
 		// 同时，在一个请求之后，bufw可能还缓存有部分数据，需要调用Flush保证数据全部发送
-		if err := c.bufw.Flush(); err != nil {
+		if err := req.finishRequest(); err != nil {
 			log.Printf("flush data failed. err:%v\n", err)
+			return
 		}
 	}
 }

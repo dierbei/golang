@@ -6,8 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -69,8 +71,38 @@ func (r *Request) parseQuery() {
 	r.queryString = parseQuery(r.Url.RawQuery)
 }
 
+func (r *Request) chunked() bool {
+	te := r.Header.Get("Transfer-Encoding")
+	return te == "chunked"
+}
+
 func (r *Request) setupBody() {
-	r.Body = &eofReader{}
+	//只允许POST和PUT方法设置报文主体
+	if r.Method != "POST" && r.Method != "PUT" {
+		r.Body = &eofReader{}
+	} else if cl := r.Header.Get("Content-Length"); cl != "" {
+		// 设置了Content-Length
+		contentLength, err := strconv.ParseInt(cl, 10, 64)
+		if err != nil {
+			r.Body = &eofReader{}
+			return
+		}
+		r.Body = io.LimitReader(r.conn.bufr, contentLength)
+		r.fixExpectContinueReader()
+	} else {
+		r.Body = &eofReader{}
+	}
+}
+
+func (r *Request) finishRequest() error {
+	//将缓存中剩余的数据发送到rwc中
+	if err := r.conn.bufw.Flush(); err != nil {
+		return err
+	}
+
+	// 消费剩余数据
+	_, err := io.Copy(ioutil.Discard, r.Body)
+	return err
 }
 
 func (r *Request) Query(name string) string {
@@ -191,3 +223,32 @@ type eofReader struct {
 func (er *eofReader) Read([]byte) (n int, err error) {
 	return 0, io.EOF
 }
+
+type expectContinueReader struct {
+	wroteContinue bool
+	r io.Reader
+	w *bufio.Writer
+}
+
+func (er *expectContinueReader) Read(p []byte) (n int, err error) {
+	//第一次读取前发送100 continue
+	if !er.wroteContinue {
+		er.w.WriteString("HTTP/1.1 100 Continue\r\n\r\n")
+		er.w.Flush()
+		er.wroteContinue = true
+	}
+
+	return er.r.Read(p)
+}
+
+func (r *Request) fixExpectContinueReader() {
+	if r.Header.Get("Expect") != "100-continue" {
+		return
+	}
+
+	r.Body = &expectContinueReader{
+		r: r.Body,
+		w: r.conn.bufw,
+	}
+}
+

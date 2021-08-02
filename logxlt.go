@@ -14,16 +14,21 @@ import (
 
 const (
 	// 默认日志文件格式
-	defaultLogFormat          = "2006-01-02-15-04"
-	// 默认日志文件输出文件夹
-	defaultLogOutPutDir       = "./logs"
+	defaultLogFormat = "2006-01-02-15-04"
+
+	// 默认日志文件输出文件夹，默认在项目根目录下新建logs文件夹保存日志文件
+	defaultLogOutPutDir = "./logs"
+
 	// 默认循环检查时间间隔
-	defaultLogDuration        = time.Second
+	defaultLogDuration = time.Second
+
 	// 默认保存多少天的日志文件
-	defaultLogOldFileMaxDay   = 7
+	defaultLogOldFileMaxDay = 7
+
 	// 默认几天压缩一次日志文件
 	defaultLogFileCompressDay = 7
-	// 默认日志文件压缩之后的存放文件夹
+
+	// 默认日志文件压缩之后的存放文件夹，此目录需要在项目根目录下手动创建
 	defaultLogFileCompressDir = "compresslog/"
 )
 
@@ -75,7 +80,6 @@ func (l *Logger) Write(content string) (int, error) {
 // autoRemoveOldFile 自动删除旧的日志文件
 func (l *Logger) autoRemoveOldFile() (err error) {
 	if len(l.oldFileList) > l.oldFileMaxDay {
-
 		if err := l.remove(l.oldFileList[0]); err != nil {
 			return err
 		}
@@ -98,7 +102,6 @@ func (l *Logger) remove(name string) error {
 
 // Setup 初始化Logger
 func (l *Logger) Setup() error {
-
 	if l.LoopDuration.Seconds() == 0 {
 		l.LoopDuration = defaultLogDuration
 	}
@@ -233,6 +236,7 @@ func (l *Logger) needNewFile() bool {
 
 func (l *Logger) needCompress() error {
 	l.isCompress++
+
 	if l.isCompress%(defaultLogFileCompressDay+1) == 0 {
 
 		runningDirPath, err := l.getRunningDirPath()
@@ -327,7 +331,6 @@ func (l *Logger) compressLogFileToTgz(src, dst string) (err error) {
 
 // getCompressLogFileName 获取压缩日志文件名
 func (l *Logger) getCompressLogFileName() string {
-
 	// example: 2021-08-02-11-27
 	prefix := l.oldFileList[0][:strings.Index(l.oldFileList[0], ".")]
 

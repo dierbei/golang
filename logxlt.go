@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -30,6 +31,11 @@ const (
 
 	// 默认日志文件压缩之后的存放文件夹，此目录需要在项目根目录下手动创建
 	defaultLogFileCompressDir = "compresslog/"
+)
+
+var (
+	Prc        *exec.Cmd
+	needAssign = false
 )
 
 func TestLoggerFile() {
@@ -62,7 +68,6 @@ func init() {
 type Logger struct {
 	FileFormat   string        //文件格式
 	LoopDuration time.Duration //循环检查的时间间隔
-	NoticeChan   chan struct{} //重启V2Ray通知管道
 
 	lastFile      *os.File   //最后创建的日志文件
 	lastFileDate  *time.Time //最后创建日志文件的时间
@@ -112,10 +117,6 @@ func (l *Logger) Setup() error {
 
 	if l.oldFileMaxDay == 0 {
 		l.oldFileMaxDay = defaultLogOldFileMaxDay
-	}
-
-	if l.NoticeChan == nil {
-		l.NoticeChan = make(chan struct{}, 1)
 	}
 
 	if err := l.createLogFileDir(); err != nil {
@@ -169,16 +170,17 @@ func (l *Logger) setLogFile() error {
 			return err
 		}
 
-		_, err := l.getNewLogFile()
+		newFile, err := l.getNewLogFile()
 		if err != nil {
 			return err
 		}
 
-		// 是否需要重启V2Ray
-		if l.isRestart {
-			l.NoticeChan <- struct{}{}
+		// 第一次启动不需要刷新文件
+		if needAssign {
+			Prc.Stdout = newFile
+			Prc.Stderr = newFile
 		} else {
-			l.isRestart = true
+			needAssign = true
 		}
 
 		return l.autoRemoveOldFile()
@@ -191,8 +193,9 @@ func (l *Logger) setLogFile() error {
 func (l *Logger) getNewLogFile() (*os.File, error) {
 	// example: 2021-07-31-10-56.log
 	fileName := fmt.Sprintf("%s.log", time.Now().Format(l.FileFormat))
+
 	// example: antl-super-automation/logs/2021-07-31-10-56.log
-	path := fmt.Sprintf("%s/%s", defaultLogOutPutDir, fileName)
+	path := fmt.Sprintf("%s/%s", defaultLogOutPutDir[2:], fileName)
 
 	newFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {

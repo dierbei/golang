@@ -61,10 +61,11 @@ func handlerConnection(conn net.Conn) {
 			// 已经超时，主动给客户端发送探测报文
 			// 发送次数设定为3次，超过三次断开与用户连接
 			detectCount++
-			if detectCount == 3 {
+			if detectCount % 3 == 0 {
 				close(isLive)
 				conn.Close()
 				log.Printf("close connect, client addr = %v\n", conn.RemoteAddr().String())
+				return
 			}
 			fmt.Printf("第%d次发送探测报文\n", detectCount)
 			conn.Write([]byte(fmt.Sprintf("%s 你在吗?.", conn.RemoteAddr().String())))

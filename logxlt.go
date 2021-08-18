@@ -86,6 +86,7 @@ func (l *Logger) Write(content string) (int, error) {
 func (l *Logger) autoRemoveOldFile() (err error) {
 	if len(l.oldFileList) > l.oldFileMaxDay {
 		if err := l.remove(l.oldFileList[0]); err != nil {
+			fmt.Println(err)
 			return err
 		}
 		l.oldFileList = l.oldFileList[1:]
@@ -101,8 +102,8 @@ func (l *Logger) remove(name string) error {
 		return err
 	}
 
-	// example: antl-super-automation/logs/2021-07-31-17-08.log
-	return os.Remove(runningDir + defaultLogOutPutDir[1:] + "/" + name)
+	fmt.Println(runningDir + "/logs" + "/" + name)
+	return os.Remove(runningDir + "/logs" + "/" + name)
 }
 
 // Setup 初始化Logger
@@ -204,8 +205,10 @@ func (l *Logger) getNewLogFile() (*os.File, error) {
 
 	if l.lastFile != nil {
 		if err := l.lastFile.Close(); err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
+		fmt.Println(l.lastFile.Name() + " 关闭")
 	}
 
 	l.lastFile = newFile

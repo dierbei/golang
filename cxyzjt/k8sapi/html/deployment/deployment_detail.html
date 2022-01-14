@@ -1,0 +1,31 @@
+
+<div class="outbox">
+    {{template "header" .}}
+    <div class="table-container is-centered" style="margin:0 auto">
+        <table class="table" >
+            <tbody>
+              <tr>
+                  <td>命名空间：{{.Data.DepDetail.NameSpace}}</td>
+                  <td>名称:{{.Data.DepDetail.Name}}</td>
+                  <td>镜像：{{.Data.DepDetail.Images}}</td>
+
+              </tr>
+            </tbody>
+        </table>
+        <table class="table"  >
+            <thead>
+             <th>Pods信息</th>
+            </thead>
+            <tbody>
+            {{range .Data.DepDetail.Pods}}
+           <tr>
+               <td>{{.Name}}</td>
+           </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{{template "footer" .}}

@@ -7,21 +7,17 @@ import (
 	"k8sapi/lib"
 )
 
-type Deployment struct {
-	Name     string
-	Replicas [3]int32
-}
-
 //显示 所有
 func ListAll(namespace string) (ret []*Deployment) {
 	ctx := context.Background()
 	listopt := metav1.ListOptions{}
 	depList, err := lib.K8sClient.AppsV1().Deployments(namespace).List(ctx, listopt)
 	lib.CheckError(err)
-	for _, item := range depList.Items { //遍历所有deployment
+	for _, item := range depList.Items {
 		ret = append(ret, &Deployment{
-			Name: item.Name,
+			Name:     item.Name,
 			Replicas: [3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas},
+			Images:    GetImages(item),
 		})
 	}
 	return

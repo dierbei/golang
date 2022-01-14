@@ -29,8 +29,8 @@ func main() {
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		server, _ := url.Parse("https://10.0.16.2:6443")
-		log.Println("请求路径3" + request.URL.Path)
-		log.Println("请求路径3" + request.URL.Path)
+		log.Println("请求路径1" + request.URL.Path)
+		log.Println("请求路径2" + request.URL.Path)
 		log.Println("请求路径3" + request.URL.Path)
 		p := httputil.NewSingleHostReverseProxy(server)
 		p.Transport = transport

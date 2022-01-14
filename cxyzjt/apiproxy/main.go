@@ -35,7 +35,7 @@ func main() {
 		p.ServeHTTP(writer, request)
 	})
 
-	log.Println("开始反代 k8sapi ")
+	log.Println("开始反代k8sapi ")
 	err := http.ListenAndServe("0.0.0.0:9090", nil)
 	if err != nil {
 		log.Fatal(err)

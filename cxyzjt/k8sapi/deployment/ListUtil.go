@@ -17,7 +17,7 @@ func ListAll(namespace string) (ret []*Deployment) {
 		ret = append(ret, &Deployment{
 			Name:     item.Name,
 			Replicas: [3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas},
-			Images:    GetImages(item),
+			Images:    GetImagesByDep(item),
 		})
 	}
 	return

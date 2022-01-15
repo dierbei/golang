@@ -8,22 +8,32 @@ import (
 )
 
 func main() {
-      r:=gin.New()
+	r := gin.New()
+	r.Use(func(context *gin.Context) {
+		defer func() {
+			if e := recover(); e != nil {
+				context.AbortWithStatusJSON(400, gin.H{
+					"error": e,
+				})
+			}
+		}()
+		context.Next()
+	})
 	r.Static("/static", "./static")
-	  r.LoadHTMLGlob("html/**/*")
-
-      r.GET("/deployments", func(c *gin.Context) {
-		  c.HTML(http.StatusOK, "deployment_list.html",
-		  		  lib.DataBuilder().
-		  			SetTitle("deployment列表").
-		  			SetData("DepList",deployment.ListAll("myweb")))
-	  })
+	r.LoadHTMLGlob("html/**/*")
+	deployment.RegHandlers(r)
+	r.GET("/deployments", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "deployment_list.html",
+			lib.DataBuilder().
+				SetTitle("deployment列表").
+				SetData("DepList", deployment.ListAll("myweb")))
+	})
 	r.GET("/deployments/:name", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "deployment_detail.html",
 			lib.DataBuilder().
 				SetTitle("deployment详情").
-				SetData("DepDetail",deployment.Detail("myweb", c.Param("name"))))
+				SetData("DepDetail", deployment.Detail("myweb", c.Param("name"))))
 	})
 
-      r.Run(":8080")
+	r.Run(":8080")
 }

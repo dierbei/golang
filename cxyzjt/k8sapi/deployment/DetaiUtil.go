@@ -2,9 +2,11 @@ package deployment
 
 import (
 	"context"
+
+	"k8sapi/lib"
+
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8sapi/lib"
 )
 
 func Detail(namespace string, depName string) *Deployment {
@@ -16,6 +18,7 @@ func Detail(namespace string, depName string) *Deployment {
 		NameSpace:  deployment.Namespace,
 		Images:     GetImagesByDep(*deployment),
 		Pods:       GetPodByDep(namespace, deployment),
+		Replicas:   [3]int32{deployment.Status.Replicas, deployment.Status.AvailableReplicas, deployment.Status.UnavailableReplicas},
 		CreateTime: deployment.CreationTimestamp.Format("2006-01-02 15:04:05"),
 	}
 }

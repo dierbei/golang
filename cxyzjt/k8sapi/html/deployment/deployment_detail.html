@@ -33,8 +33,8 @@
                         dataType: "json",
                         success: function(data){
                             if(data.message==="Ok"){
-                                alert("操作成功")
-                                self.location.reload()
+                               // alert("操作成功")
+
                             }
                         },
                         error:function (data) {
@@ -59,25 +59,53 @@
             <div class="table-container">
              <table class="table"  >
                 <thead>
+                <th width="10%">状态</th>
                 <th width="50%">名称</th>
                 <th>镜像</th>
                 <th>主机</th>
                 <th>创建时间</th>
                 </thead>
-                <tbody>
-                {{range .Data.DepDetail.Pods}}
+                <tbody id="podlist">
                     <tr>
-                        <td>{{.Name}}</td>
-                        <td>{{.Images}}</td>
-                        <td>{{.NodeName}}</td>
-                        <td>{{.CreateTime}}</td>
+                        <td>${Phase}</td>
+                        <td>${Name}
+                           <p>${Message}</p>
+                        </td>
+                        <td>${Images}</td>
+                        <td>${NodeName} </td>
+                        <td>${CreateTime} </td>
                     </tr>
-                {{end}}
+
                 </tbody>
             </table>
             </div>
         </nav>
-
+            <script>
+                let tmpl=$("#podlist").html()
+                $("#podlist").html("");
+                $.template( "pods", tmpl );
+                const ns=$("#ns").attr("v")
+                const dep=$("#deployment").attr("v")
+                function loadPods() {
+                    $.ajax({
+                        type: "POST",
+                        url: "/core/pods?namespace="+ns+"&deployment="+dep,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.message === "Ok") {
+                                $("#podlist").html("");
+                                $.tmpl("pods", data.result )
+                                    .appendTo( "#podlist" );
+                            }
+                        },
+                        error: function (data) {
+                            alert(data.responseJSON.error)
+                        }
+                    })
+                }
+                loadPods()
+                window.setInterval("loadPods()",800)
+            </script>
     </div>
 
 </div>

@@ -10,8 +10,10 @@ type Deployment struct {
 }
 
 type Pod struct {
-	Name       string
-	Images     string
-	NodeName   string
+	Name string
+	Images string
+	NodeName string
+	Phase string  // pod 当前所处的阶段
+	Message string
 	CreateTime string
 }

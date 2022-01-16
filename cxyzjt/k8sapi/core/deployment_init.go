@@ -23,8 +23,24 @@ func InitDeployment() {
 	fact := informers.NewSharedInformerFactory(lib.K8sClient, 0)
 	depInformer := fact.Apps().V1().Deployments()
 	depInformer.Informer().AddEventHandler(&DepHandler{})
+	podInformer:=fact.Core().V1().Pods()
+	podInformer.Informer().AddEventHandler(&PodHandler{})
+
+	rsInformer:=fact.Apps().V1().ReplicaSets()
+	rsInformer.Informer().AddEventHandler(&RsHandler{})
 	fact.Start(wait.NeverStop)
 
+}
+
+func(this *DeploymentMap) GetDeployment(ns string,depname string) (*v1.Deployment,error){
+	if list,ok:=this.Data.Load(ns);ok {
+		for _,item:=range list.([]*v1.Deployment){
+			if item.Name==depname{
+				return item,nil
+			}
+		}
+	}
+	return nil,fmt.Errorf("record not found")
 }
 
 type DepHandler struct{}

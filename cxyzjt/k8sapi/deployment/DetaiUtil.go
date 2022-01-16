@@ -24,7 +24,7 @@ func Detail(namespace string, depName string) *Deployment {
 }
 
 func GetPodByDep(namespace string, dep *v1.Deployment) []Pod {
-	getopt := metav1.ListOptions{LabelSelector: GetLabels(dep.Spec.Selector.MatchLabels)}
+	getopt := metav1.ListOptions{LabelSelector: GetRsLabelByDeployment(dep)}
 	podList, err := lib.K8sClient.CoreV1().Pods(namespace).List(context.Background(), getopt)
 	lib.CheckError(err)
 	podSlice := make([]Pod, len(podList.Items))

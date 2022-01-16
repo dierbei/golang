@@ -1,8 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myngx
-  namespace: myweb
+  name: ngx3
 spec:
   selector:
     matchLabels:
@@ -13,8 +12,6 @@ spec:
       labels:
         app: nginx
     spec:
-      nodeSelector:
-        name: a2
       containers:
         - name: nginxtest
           image: nginx:1.18-alpine

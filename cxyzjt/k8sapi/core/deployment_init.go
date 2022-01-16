@@ -5,6 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8sapi/lib"
+	"log"
 	"sync"
 
 	v1 "k8s.io/api/apps/v1"
@@ -33,13 +34,16 @@ func (this *DepHandler) OnAdd(obj interface{}) {
 }
 
 func (this *DepHandler) OnUpdate(oldObj, newObj interface{}) {
-	if dep, ok := newObj.(*v1.Deployment); ok {
-		fmt.Println(dep.Name)
+	err := DepMap.Update(newObj.(*v1.Deployment))
+	if err != nil {
+		log.Println(err)
 	}
 }
 
 func (this *DepHandler) OnDelete(obj interface{}) {
-
+	if d, ok := obj.(*v1.Deployment); ok {
+		DepMap.Delete(d)
+	}
 }
 
 type DeploymentMap struct {
@@ -60,4 +64,28 @@ func (this *DeploymentMap) ListByNS(namespace string) ([]*v1.Deployment, error) 
 		return list.([]*v1.Deployment), nil
 	}
 	return nil, fmt.Errorf("record not found")
+}
+
+func (this *DeploymentMap) Update(deploy *v1.Deployment) error {
+	if list, ok := this.Data.Load(deploy.Namespace); ok {
+		for i, v := range list.([]*v1.Deployment) {
+			if v.Name == deploy.Name {
+				list.([]*v1.Deployment)[i] = deploy
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("deployment-%s not found", deploy.Name)
+}
+
+func (this *DeploymentMap) Delete(deploy *v1.Deployment) {
+	if list, ok := this.Data.Load(deploy.Namespace); ok {
+		for i, v := range list.([]*v1.Deployment) {
+			if v.Name == deploy.Name {
+				list = append(list.([]*v1.Deployment)[:i], list.([]*v1.Deployment)[i+1:]...)
+				this.Data.Store(deploy.Namespace, list)
+				break
+			}
+		}
+	}
 }

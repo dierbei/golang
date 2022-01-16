@@ -5,10 +5,17 @@ import (
 	"github.com/gin-gonic/gin"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8sapi/lib"
+	"net/http"
 )
 
 func RegHandlers(r *gin.Engine) {
 	r.POST("/update/deployment/scale", incrReplicas)
+	r.POST("/core/deployments",ListAllDeployments)
+}
+
+func ListAllDeployments(ctx *gin.Context)  {
+	ns := ctx.DefaultQuery("namesapce", "default")
+	ctx.JSON(http.StatusOK,gin.H{"message":"Ok","result":ListAll(ns)})
 }
 
 type incrRep struct {

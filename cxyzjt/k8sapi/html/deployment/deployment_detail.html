@@ -1,7 +1,6 @@
 
 <div class="outbox">
     {{template "header" .}}
-    <script src='https://libs.baidu.com/jquery/2.1.4/jquery.js'></script>
     <div class="table-container is-centered" style="margin:0 auto">
         <table class="table" >
             <tbody>
@@ -18,7 +17,6 @@
                     <button id="dec" class="button is-info is-small is-btn is-bold">-</button>
                 </td>
             </tr>
-
             <script>
                 function getObject(dec){
                     return {
@@ -34,7 +32,7 @@
                         data: JSON.stringify(getObject(dec)),
                         dataType: "json",
                         success: function(data){
-                            if(data.message==="ok"){
+                            if(data.message==="Ok"){
                                 alert("操作成功")
                                 self.location.reload()
                             }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"k8sapi/core"
 	"k8sapi/deployment"
 	"k8sapi/lib"
 	"net/http"
@@ -35,5 +36,6 @@ func main() {
 				SetData("DepDetail", deployment.Detail("myweb", c.Param("name"))))
 	})
 
+	core.InitDeployment()
 	r.Run(":8080")
 }

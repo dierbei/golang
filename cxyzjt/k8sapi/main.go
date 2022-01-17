@@ -1,25 +1,41 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
+	"github.com/gin-gonic/gin"
+	"k8sapi/core"
+	"k8sapi/deployment"
+	"k8sapi/lib"
 	"net/http"
 )
 
 func main() {
-	req, err := http.NewRequest("GET", "http://175.24.198.168:9090", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	r := gin.New()
+	r.Use(func(context *gin.Context) {
+		defer func() {
+			if e := recover(); e != nil {
+				context.AbortWithStatusJSON(400, gin.H{
+					"error": e,
+				})
+			}
+		}()
+		context.Next()
+	})
+	r.Static("/static", "./static")
+	r.LoadHTMLGlob("html/**/*")
+	deployment.RegHandlers(r)
+	r.GET("/deployments", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "deployment_list.html",
+			lib.DataBuilder().
+				SetTitle("deployment列表").
+				SetData("DepList", deployment.ListAll("default")))
+	})
+	r.GET("/deployments/:name", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "deployment_detail.html",
+			lib.DataBuilder().
+				SetTitle("deployment详情").
+				SetData("DepDetail", deployment.Detail("default", c.Param("name"))))
+	})
 
-	//req.Header.Add("Authorization", "Bearer kubeconfig-user-r8wp5.c-sld9n:hdkwqrwrblpmwkgj7m29vjgw7xqmsb2hqwnm7b9rgfgg7xdtft8lqr")
-	rsp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer rsp.Body.Close()
-	b, _ := ioutil.ReadAll(rsp.Body)
-	fmt.Println(string(b))
+	core.InitDeployment()
+	r.Run(":8080")
 }

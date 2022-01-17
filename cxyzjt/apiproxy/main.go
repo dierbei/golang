@@ -29,13 +29,13 @@ func main() {
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		server, _ := url.Parse("https://10.0.16.2:6443")
-		log.Println("请求路径：" + request.URL.Path)
+		log.Println(request.URL.Path, "--》" + request.Method)
 		p := httputil.NewSingleHostReverseProxy(server)
 		p.Transport = transport
 		p.ServeHTTP(writer, request)
 	})
 
-	log.Println("开始反代 k8sapi ")
+	log.Println("开始反代k8sapi ")
 	err := http.ListenAndServe("0.0.0.0:9090", nil)
 	if err != nil {
 		log.Fatal(err)

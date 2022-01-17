@@ -10,6 +10,7 @@ type Deployment struct {
 }
 
 type Pod struct {
+	IsReady bool
 	Name string
 	Images string
 	NodeName string

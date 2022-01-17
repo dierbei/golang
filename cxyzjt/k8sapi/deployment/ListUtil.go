@@ -30,7 +30,8 @@ func ListPodsByLabel(ns string, labels map[string]string) (ret []*Pod) {
 			Images:GetImages(item.Spec.Containers),
 			NodeName:item.Spec.NodeName,
 			Phase:string(item.Status.Phase),// 阶段
-			Message:GetPodMessage(*item),
+			IsReady:GetPodIsReady(*item),
+			Message:core.EventMap.GetMessage(item.Namespace,"Pod",item.Name),
 			CreateTime:item.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		})
 	}

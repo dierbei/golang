@@ -25,6 +25,8 @@ func InitDeployment() {
 	depInformer.Informer().AddEventHandler(&DepHandler{})
 	podInformer:=fact.Core().V1().Pods()
 	podInformer.Informer().AddEventHandler(&PodHandler{})
+	eventInformer:=fact.Core().V1().Events()
+	eventInformer.Informer().AddEventHandler(&EventHandler{})
 
 	rsInformer:=fact.Apps().V1().ReplicaSets()
 	rsInformer.Informer().AddEventHandler(&RsHandler{})

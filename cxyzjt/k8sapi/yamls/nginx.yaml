@@ -16,6 +16,6 @@ spec:
         - name: nginxtest
           image: nginx:1.18-alpine
           imagePullPolicy: IfNotPresent
-          command: ["/app"]
+          #command: ["/app"]
           ports:
             - containerPort: 80

@@ -59,6 +59,7 @@
             <div class="table-container">
              <table class="table"  >
                 <thead>
+                <th width="10%">阶段</th>
                 <th width="10%">状态</th>
                 <th width="50%">名称</th>
                 <th>镜像</th>
@@ -68,8 +69,9 @@
                 <tbody id="podlist">
                     <tr>
                         <td>${Phase}</td>
+                        <td>${Status}</td>
                         <td>${Name}
-                           <p>${Message}</p>
+                           <p class="is-red">${Message}</p>
                         </td>
                         <td>${Images}</td>
                         <td>${NodeName} </td>
@@ -81,6 +83,7 @@
             </div>
         </nav>
             <script>
+                let orgData=""
                 let tmpl=$("#podlist").html()
                 $("#podlist").html("");
                 $.template( "pods", tmpl );
@@ -93,9 +96,22 @@
                         dataType: "json",
                         success: function (data) {
                             if (data.message === "Ok") {
-                                $("#podlist").html("");
-                                $.tmpl("pods", data.result )
-                                    .appendTo( "#podlist" );
+                                let tmpMd5=md5(JSON.stringify(data.result))
+                                if(tmpMd5!==orgData){
+                                    $("#podlist").html("");
+                                    let pods=data.result ;// pods列表
+                                    pods.forEach((pod)=>{
+                                        if(pod.IsReady){
+                                            pod.Status="Active"
+                                            pod.Message=""
+                                        }
+                                        else
+                                            pod.Status="Waiting"
+                                    })
+                                    $.tmpl("pods", pods )
+                                        .appendTo( "#podlist" );
+                                    orgData=tmpMd5
+                                }
                             }
                         },
                         error: function (data) {

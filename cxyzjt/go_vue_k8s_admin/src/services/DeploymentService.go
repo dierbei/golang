@@ -1,15 +1,15 @@
 package services
 
 import (
-	"github.com/shenyisyn/goft-gin/goft"
-	"go_vue_k8s_admin/src/core"
 	"go_vue_k8s_admin/src/models"
+
+	"github.com/shenyisyn/goft-gin/goft"
 	v1 "k8s.io/api/apps/v1"
 )
 
 type DeploymentService struct {
-	DeployMap *core.DeploymentMap `inject:"-"`
-	CommonSvc *CommonService      `inject:"-"`
+	DeployMap *DeploymentMap `inject:"-"`
+	CommonSvc *CommonService `inject:"-"`
 }
 
 func NewDeploymentService() *DeploymentService {

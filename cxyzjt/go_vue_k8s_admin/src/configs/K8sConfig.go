@@ -3,7 +3,7 @@ package configs
 import (
 	"log"
 
-	"go_vue_k8s_admin/src/core"
+	"go_vue_k8s_admin/src/services"
 
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
@@ -12,8 +12,8 @@ import (
 )
 
 type K8sConfig struct {
-	DeployHandler *core.DeployHandler `inject:"-"`
-	PodHandler    *core.PodHandler    `inject:"-"`
+	DeployHandler *services.DeployHandler `inject:"-"`
+	PodHandler    *services.PodHandler    `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {

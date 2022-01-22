@@ -1,13 +1,11 @@
 package services
 
 import (
-	"go_vue_k8s_admin/src/core"
-
 	"github.com/shenyisyn/goft-gin/goft"
 )
 
 type PodService struct {
-	PodMap *core.PodMap `inject:"-"`
+	PodMap *PodMap `inject:"-"`
 }
 
 func NewPodService() *PodService {

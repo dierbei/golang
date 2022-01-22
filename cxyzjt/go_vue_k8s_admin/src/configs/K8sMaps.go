@@ -1,7 +1,7 @@
 package configs
 
 import (
-	"go_vue_k8s_admin/src/core"
+	"go_vue_k8s_admin/src/services"
 
 	"k8s.io/client-go/kubernetes"
 )
@@ -15,11 +15,11 @@ func NewK8sMaps() *K8sMaps {
 }
 
 //InitDeploymentMap 初始化Deployment存储Map
-func (m *K8sMaps) InitDeploymentMap() *core.DeploymentMap {
-	return &core.DeploymentMap{}
+func (m *K8sMaps) InitDeploymentMap() *services.DeploymentMap {
+	return &services.DeploymentMap{}
 }
 
 //InitPodMap 初始化Pod存储Map
-func (m *K8sMaps) InitPodMap() *core.PodMap {
-	return &core.PodMap{}
+func (m *K8sMaps) InitPodMap() *services.PodMap {
+	return &services.PodMap{}
 }

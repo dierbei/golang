@@ -19,9 +19,8 @@ func main() {
 		Mount("",
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
-		).
-		Mount("",
 			controllers.NewUserCtl(),
+			controllers.NewWsCtl(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

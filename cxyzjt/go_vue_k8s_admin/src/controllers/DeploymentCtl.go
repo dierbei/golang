@@ -19,7 +19,10 @@ func NewDeploymentCtl() *DeploymentCtl {
 
 func (ctl *DeploymentCtl) GetList(ctx *gin.Context) goft.Json {
 	list := ctl.DeploySvc.ListAll("default")
-	return list
+	return gin.H{
+		"code": 20000,
+		"data": list,
+	}
 }
 
 func (ctl *DeploymentCtl) Build(goft *goft.Goft) {

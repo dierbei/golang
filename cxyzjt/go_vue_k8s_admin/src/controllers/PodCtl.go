@@ -17,7 +17,10 @@ func NewPodCtl() *PodCtl {
 }
 
 func (ctl *PodCtl) GetAll(ctx *gin.Context) goft.Json {
-	return ctl.PodSvc.ListByNs("default")
+	return gin.H{
+		"code": 20000,
+		"data": ctl.PodSvc.ListByNs("default"),
+	}
 }
 
 func (ctl *PodCtl) Build(goft *goft.Goft) {

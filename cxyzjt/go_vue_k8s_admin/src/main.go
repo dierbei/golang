@@ -21,6 +21,7 @@ func main() {
 			controllers.NewPodCtl(),
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),
+			controllers.NewNamespaceCtl(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

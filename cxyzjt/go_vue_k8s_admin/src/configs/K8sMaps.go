@@ -23,3 +23,13 @@ func (m *K8sMaps) InitDeploymentMap() *services.DeploymentMap {
 func (m *K8sMaps) InitPodMap() *services.PodMap {
 	return &services.PodMap{}
 }
+
+//InitNamespaceMap 初始化Namespace存储Map
+func (m *K8sMaps) InitNamespaceMap() *services.NameSpaceMap {
+	return &services.NameSpaceMap{}
+}
+
+//InitEventMap 初始化Event存储Map
+func (m *K8sMaps) InitEventMap() *services.EventMap {
+	return &services.EventMap{}
+}

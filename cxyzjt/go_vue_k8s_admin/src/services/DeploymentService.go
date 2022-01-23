@@ -26,6 +26,7 @@ func (svc *DeploymentService) ListAll(namespace string) (result []*models.Deploy
 			Images:     svc.CommonSvc.GetImages(*v),
 			IsComplete: svc.getDeploymentIsComplete(v),
 			Message:    svc.getDeploymentCondition(v),
+			CreateTime: v.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		})
 	}
 	return

@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"go_vue_k8s_admin/src/services"
+
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
-	"go_vue_k8s_admin/src/services"
 	"k8s.io/client-go/kubernetes"
 )
 

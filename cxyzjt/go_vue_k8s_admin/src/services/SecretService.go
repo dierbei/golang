@@ -28,3 +28,17 @@ func (svc *SecretService) ListSecret(ns string) []*models.SecretModel {
 	}
 	return ret
 }
+
+//解析 （如类型是 tls 的secret)
+func (this *SecretService) ParseIfTLS(t string, data map[string][]byte) interface{} {
+	if t == "kubernetes.io/tls" {
+		if crt, ok := data["tls.crt"]; ok {
+			crtModel := ParseCert(crt)
+			if crtModel != nil {
+				return crtModel
+			}
+		}
+	}
+	return struct{}{}
+
+}

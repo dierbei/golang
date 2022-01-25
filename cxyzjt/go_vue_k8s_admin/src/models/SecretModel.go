@@ -22,4 +22,13 @@ type SecretModel struct {
 	NameSpace  string
 	CreateTime string
 	Type       string //类型
+	Data       map[string][]byte
+	ExtData    interface{} // 额外数据
+}
+
+type PostSecretModel struct {
+	Name      string
+	NameSpace string
+	Type      string //类型
+	Data      map[string]string
 }

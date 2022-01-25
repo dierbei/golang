@@ -33,3 +33,18 @@ func (m *K8sMaps) InitNamespaceMap() *services.NameSpaceMap {
 func (m *K8sMaps) InitEventMap() *services.EventMap {
 	return &services.EventMap{}
 }
+
+//InitIngressMap 初始化Ingress存储Map
+func (m *K8sMaps) InitIngressMap() *services.IngressMap {
+	return &services.IngressMap{}
+}
+
+//InitServiceMap 初始化Service存储Map
+func (m *K8sMaps) InitServiceMap() *services.ServiceMap {
+	return &services.ServiceMap{}
+}
+
+//InitSecretMap 初始化Secret存储Map
+func (m *K8sMaps) InitSecretMap() *services.SecretMap {
+	return &services.SecretMap{}
+}

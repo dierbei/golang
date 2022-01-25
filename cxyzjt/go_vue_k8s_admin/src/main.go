@@ -22,6 +22,9 @@ func main() {
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),
 			controllers.NewNamespaceCtl(),
+			controllers.NewIngressCtl(),
+			controllers.NewSvcCtl(),
+			controllers.NewSecretCtl(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

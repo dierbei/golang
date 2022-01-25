@@ -2,12 +2,14 @@ package services
 
 import (
 	"fmt"
-	"go_vue_k8s_admin/src/models"
 	"sort"
 	"sync"
 
+	"go_vue_k8s_admin/src/models"
+
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/api/networking/v1beta1"
 )
 
 type MapItems []*MapItem
@@ -216,4 +218,251 @@ func (m *EventMap) GetMessage(ns string, king string, name string) string {
 		return v.(*corev1.Event).Message
 	}
 	return ""
+}
+
+type V1Beta1Ingress []*v1beta1.Ingress
+
+func (m V1Beta1Ingress) Len() int {
+	return len(m)
+}
+
+func (m V1Beta1Ingress) Less(i, j int) bool {
+	//根据时间排序    倒排序
+	return m[i].CreationTimestamp.Time.After(m[j].CreationTimestamp.Time)
+}
+
+func (m V1Beta1Ingress) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+type IngressMap struct {
+	// namespace:[]*v1beta1.Ingress
+	data sync.Map
+}
+
+// Add 添加Ingress
+func (m *IngressMap) Add(ingress *v1beta1.Ingress) {
+	if list, ok := m.data.Load(ingress.Namespace); ok {
+		list = append(list.([]*v1beta1.Ingress), ingress)
+		m.data.Store(ingress.Namespace, list)
+	} else {
+		m.data.Store(ingress.Namespace, []*v1beta1.Ingress{ingress})
+	}
+}
+
+// Update 更新Ingress
+func (m *IngressMap) Update(ingress *v1beta1.Ingress) error {
+	if list, ok := m.data.Load(ingress.Namespace); ok {
+		for i, v := range list.([]*v1beta1.Ingress) {
+			if v.Name == ingress.Name {
+				list.([]*v1beta1.Ingress)[i] = ingress
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("ingress-%s not found", ingress.Name)
+}
+
+// Delete 删除Ingress
+func (m *IngressMap) Delete(ingress *v1beta1.Ingress) {
+	if list, ok := m.data.Load(ingress.Namespace); ok {
+		for i, v := range list.([]*v1beta1.Ingress) {
+			if v.Name == ingress.Name {
+				newList := append(list.([]*v1beta1.Ingress)[:i], list.([]*v1beta1.Ingress)[i+1:]...)
+				m.data.Store(ingress.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+// Get 获取单个Ingress
+func (m *IngressMap) Get(ns string, name string) *v1beta1.Ingress {
+	if list, ok := m.data.Load(ns); ok {
+		for _, v := range list.([]*v1beta1.Ingress) {
+			if v.Name == name {
+				return v
+			}
+		}
+	}
+	return nil
+}
+
+// ListAll 查询命名空间下的Ingress列表
+func (m *IngressMap) ListAll(ns string) []*v1beta1.Ingress {
+	if list, ok := m.data.Load(ns); ok {
+		newList := list.([]*v1beta1.Ingress)
+		sort.Sort(V1Beta1Ingress(newList))
+		return newList
+	}
+	return []*v1beta1.Ingress{}
+}
+
+//func (m *IngressMap) ListAll(ns string) []*models.IngressModel {
+//	if list, ok := m.data.Load(ns); ok {
+//		ingressList := list.([]*v1beta1.Ingress)
+//		sort.Sort(V1Beta1Ingress(ingressList))
+//		result := make([]*models.IngressModel, len(ingressList))
+//		for i, v := range ingressList {
+//			result[i] = &models.IngressModel{
+//				Name:       v.Name,
+//				NameSpace:  v.Namespace,
+//				CreateTime: v.CreationTimestamp.Format("2006-01-02 15:04:05"),
+//				Host:       v.Spec.Rules[0].Host,
+//			}
+//		}
+//		return result
+//	}
+//	return nil
+//}
+
+type CoreV1Service []*corev1.Service
+
+func (m CoreV1Service) Len() int {
+	return len(m)
+}
+
+func (m CoreV1Service) Less(i, j int) bool {
+	//根据时间排序    倒排序
+	return m[i].CreationTimestamp.Time.After(m[j].CreationTimestamp.Time)
+}
+
+func (m CoreV1Service) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+type ServiceMap struct {
+	// namespace:[]*v1.Service
+	data sync.Map
+}
+
+// Add 添加Service
+func (m *ServiceMap) Add(svc *corev1.Service) {
+	if list, ok := m.data.Load(svc.Namespace); ok {
+		list = append(list.([]*corev1.Service), svc)
+		m.data.Store(svc.Namespace, list)
+	} else {
+		m.data.Store(svc.Namespace, []*corev1.Service{svc})
+	}
+}
+
+// Update 更新Service
+func (m *ServiceMap) Update(svc *corev1.Service) error {
+	if list, ok := m.data.Load(svc.Namespace); ok {
+		for i, v := range list.([]*corev1.Service) {
+			if v.Name == svc.Name {
+				list.([]*corev1.Service)[i] = svc
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("service-%s not found", svc.Name)
+}
+
+// Delete 删除Service
+func (m *ServiceMap) Delete(svc *corev1.Service) {
+	if list, ok := m.data.Load(svc.Namespace); ok {
+		for i, v := range list.([]*corev1.Service) {
+			if v.Name == svc.Name {
+				newList := append(list.([]*corev1.Service)[:i], list.([]*corev1.Service)[i+1:]...)
+				m.data.Store(svc.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+// ListAll 查询Service列表
+func (m *ServiceMap) ListAll(ns string) []*models.ServiceModel {
+	if list, ok := m.data.Load(ns); ok {
+		svcList := list.([]*corev1.Service)
+		sort.Sort(CoreV1Service(svcList))
+		result := make([]*models.ServiceModel, len(svcList))
+		for i, v := range svcList {
+			result[i] = &models.ServiceModel{
+				Name:       v.Name,
+				NameSpace:  v.Namespace,
+				CreateTime: v.CreationTimestamp.Format("2006-01-02 15:04:05"),
+			}
+		}
+		return result
+	}
+	return nil
+}
+
+type CoreV1Secret []*corev1.Secret
+
+func (m CoreV1Secret) Len() int {
+	return len(m)
+}
+func (m CoreV1Secret) Less(i, j int) bool {
+	//根据时间排序    倒排序
+	return m[i].CreationTimestamp.Time.After(m[j].CreationTimestamp.Time)
+}
+func (m CoreV1Secret) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+type SecretMap struct {
+	// namespace:[]*v1.Secret
+	data sync.Map
+}
+
+// Add 添加Secret
+func (m *SecretMap) Add(item *corev1.Secret) {
+	if list, ok := m.data.Load(item.Namespace); ok {
+		list = append(list.([]*corev1.Secret), item)
+		m.data.Store(item.Namespace, list)
+	} else {
+		m.data.Store(item.Namespace, []*corev1.Secret{item})
+
+	}
+}
+
+// Update 更新Secret
+func (m *SecretMap) Update(item *corev1.Secret) error {
+	if list, ok := m.data.Load(item.Namespace); ok {
+		for i, v := range list.([]*corev1.Secret) {
+			if v.Name == item.Name {
+				list.([]*corev1.Secret)[i] = item
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("secret-%s not found", item.Name)
+}
+
+// Delete 珊瑚Secret
+func (m *SecretMap) Delete(svc *corev1.Secret) {
+	if list, ok := m.data.Load(svc.Namespace); ok {
+		for i, v := range list.([]*corev1.Secret) {
+			if v.Name == svc.Name {
+				newList := append(list.([]*corev1.Secret)[:i], list.([]*corev1.Secret)[i+1:]...)
+				m.data.Store(svc.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+// Get 获取Secret
+func (m *SecretMap) Get(ns string, name string) *corev1.Secret {
+	if items, ok := m.data.Load(ns); ok {
+		for _, v := range items.([]*corev1.Secret) {
+			if v.Name == name {
+				return v
+			}
+		}
+	}
+	return nil
+}
+
+// ListAll 根据命名空间获取Secret列表
+func (m *SecretMap) ListAll(ns string) []*corev1.Secret {
+	if list, ok := m.data.Load(ns); ok {
+		secretList := list.([]*corev1.Secret)
+		sort.Sort(CoreV1Secret(secretList))
+		return secretList
+	}
+	return nil
 }

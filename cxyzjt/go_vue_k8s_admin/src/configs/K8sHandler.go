@@ -26,3 +26,15 @@ func (h *K8sHandler) NamespaceHandler() *services.NameSpaceHandler {
 func (h *K8sHandler) EventHandler() *services.EventHandler {
 	return &services.EventHandler{}
 }
+
+func (h *K8sHandler) IngressHandler() *services.IngressHandler {
+	return &services.IngressHandler{}
+}
+
+func (h *K8sHandler) ServiceHandler() *services.ServiceHandler {
+	return &services.ServiceHandler{}
+}
+
+func (h *K8sHandler) SecretHandler() *services.SecretHandler {
+	return &services.SecretHandler{}
+}

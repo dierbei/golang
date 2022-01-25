@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/api/networking/v1beta1"
 )
 
 // DeployHandler 处理Deployment回调的Handler
@@ -148,4 +149,138 @@ func (h *EventHandler) storeData(obj interface{}, isdelete bool) {
 			h.EventMap.data.Delete(key)
 		}
 	}
+}
+
+type IngressHandler struct {
+	IngressMap *IngressMap `inject:"-"`
+}
+
+func (h *IngressHandler) OnAdd(obj interface{}) {
+	h.IngressMap.Add(obj.(*v1beta1.Ingress))
+	ns := obj.(*v1beta1.Ingress).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "ingress",
+			"result": gin.H{"ns": ns,
+				"data": h.IngressMap.ListAll(ns)},
+		},
+	)
+}
+
+func (h *IngressHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := h.IngressMap.Update(newObj.(*v1beta1.Ingress))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ns := newObj.(*v1beta1.Ingress).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "ingress",
+			"result": gin.H{"ns": ns,
+				"data": h.IngressMap.ListAll(ns)},
+		},
+	)
+
+}
+
+func (h *IngressHandler) OnDelete(obj interface{}) {
+	h.IngressMap.Delete(obj.(*v1beta1.Ingress))
+	ns := obj.(*v1beta1.Ingress).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "ingress",
+			"result": gin.H{"ns": ns,
+				"data": h.IngressMap.ListAll(ns)},
+		},
+	)
+}
+
+type ServiceHandler struct {
+	SvcMap *ServiceMap `inject:"-"`
+}
+
+func (h *ServiceHandler) OnAdd(obj interface{}) {
+	h.SvcMap.Add(obj.(*corev1.Service))
+	ns := obj.(*corev1.Service).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "service",
+			"result": gin.H{"ns": ns,
+				"data": h.SvcMap.ListAll(ns)},
+		},
+	)
+}
+
+func (h *ServiceHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := h.SvcMap.Update(newObj.(*corev1.Service))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ns := newObj.(*corev1.Service).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "service",
+			"result": gin.H{"ns": ns,
+				"data": h.SvcMap.ListAll(ns)},
+		},
+	)
+}
+
+func (h *ServiceHandler) OnDelete(obj interface{}) {
+	h.SvcMap.Delete(obj.(*corev1.Service))
+	ns := obj.(*corev1.Service).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "service",
+			"result": gin.H{"ns": ns,
+				"data": h.SvcMap.ListAll(ns)},
+		},
+	)
+}
+
+type SecretHandler struct {
+	SecretMap *SecretMap     `inject:"-"`
+	SecretSvc *SecretService `inject:"-"`
+}
+
+func (svc *SecretHandler) OnAdd(obj interface{}) {
+	svc.SecretMap.Add(obj.(*corev1.Secret))
+	ns := obj.(*corev1.Secret).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "secret",
+			"result": gin.H{"ns": ns,
+				"data": svc.SecretSvc.ListSecret(ns)},
+		},
+	)
+}
+
+func (svc *SecretHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := svc.SecretMap.Update(newObj.(*corev1.Secret))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ns := newObj.(*corev1.Secret).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "secret",
+			"result": gin.H{"ns": ns,
+				"data": svc.SecretSvc.ListSecret(ns)},
+		},
+	)
+}
+
+func (svc *SecretHandler) OnDelete(obj interface{}) {
+	svc.SecretMap.Delete(obj.(*corev1.Secret))
+	ns := obj.(*corev1.Secret).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "secret",
+			"result": gin.H{"ns": ns,
+				"data": svc.SecretSvc.ListSecret(ns)},
+		},
+	)
 }

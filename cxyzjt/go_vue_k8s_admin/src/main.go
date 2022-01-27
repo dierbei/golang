@@ -1,10 +1,11 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go_vue_k8s_admin/src/configs"
 	"go_vue_k8s_admin/src/controllers"
-	"net/http"
 
 	"github.com/shenyisyn/goft-gin/goft"
 )
@@ -25,6 +26,7 @@ func main() {
 			controllers.NewIngressCtl(),
 			controllers.NewSvcCtl(),
 			controllers.NewSecretCtl(),
+			controllers.NewConfigMapCtl(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

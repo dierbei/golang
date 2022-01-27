@@ -12,13 +12,14 @@ import (
 )
 
 type K8sConfig struct {
-	DeployHandler  *services.DeployHandler    `inject:"-"`
-	PodHandler     *services.PodHandler       `inject:"-"`
-	NameHandler    *services.NameSpaceHandler `inject:"-"`
-	EventHandler   *services.EventHandler     `inject:"-"`
-	IngressHandler *services.IngressHandler   `inject:"-"`
-	ServiceHandler *services.ServiceHandler   `inject:"-"`
-	SecretHandker  *services.SecretHandler    `inject:"-"`
+	DeployHandler    *services.DeployHandler    `inject:"-"`
+	PodHandler       *services.PodHandler       `inject:"-"`
+	NameHandler      *services.NameSpaceHandler `inject:"-"`
+	EventHandler     *services.EventHandler     `inject:"-"`
+	IngressHandler   *services.IngressHandler   `inject:"-"`
+	ServiceHandler   *services.ServiceHandler   `inject:"-"`
+	SecretHandler    *services.SecretHandler    `inject:"-"`
+	ConfigMapHandler *services.ConfigMapHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -47,7 +48,8 @@ func (cfg *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	factory.Core().V1().Events().Informer().AddEventHandler(cfg.EventHandler)
 	factory.Networking().V1beta1().Ingresses().Informer().AddEventHandler(cfg.IngressHandler)
 	factory.Core().V1().Services().Informer().AddEventHandler(cfg.ServiceHandler)
-	factory.Core().V1().Secrets().Informer().AddEventHandler(cfg.SecretHandker)
+	factory.Core().V1().Secrets().Informer().AddEventHandler(cfg.SecretHandler)
+	factory.Core().V1().ConfigMaps().Informer().AddEventHandler(cfg.ConfigMapHandler)
 
 	factory.Start(wait.NeverStop)
 	return factory

@@ -284,3 +284,46 @@ func (svc *SecretHandler) OnDelete(obj interface{}) {
 		},
 	)
 }
+
+type ConfigMapHandler struct {
+	ConfigMap        *ConfigMap        `inject:"-"`
+	ConfigMapService *ConfigMapService `inject:"-"`
+}
+
+func (h *ConfigMapHandler) OnAdd(obj interface{}) {
+	h.ConfigMap.Add(obj.(*corev1.ConfigMap))
+	ns := obj.(*corev1.ConfigMap).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "cm",
+			"result": gin.H{"ns": ns,
+				"data": h.ConfigMapService.ListConfigMap(ns)},
+		},
+	)
+}
+
+func (h *ConfigMapHandler) OnUpdate(oldObj, newObj interface{}) {
+	//重点： 只要update返回true 才会发送 。否则不发送
+	if h.ConfigMap.Update(newObj.(*corev1.ConfigMap)) {
+		ns := newObj.(*corev1.ConfigMap).Namespace
+		wscore.ClientMap.SendAll(
+			gin.H{
+				"type": "cm",
+				"result": gin.H{"ns": ns,
+					"data": h.ConfigMapService.ListConfigMap(ns)},
+			},
+		)
+	}
+}
+
+func (h *ConfigMapHandler) OnDelete(obj interface{}) {
+	h.ConfigMap.Delete(obj.(*corev1.ConfigMap))
+	ns := obj.(*corev1.ConfigMap).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "cm",
+			"result": gin.H{"ns": ns,
+				"data": h.ConfigMapService.ListConfigMap(ns)},
+		},
+	)
+}

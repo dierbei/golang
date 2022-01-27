@@ -48,3 +48,8 @@ func (m *K8sMaps) InitServiceMap() *services.ServiceMap {
 func (m *K8sMaps) InitSecretMap() *services.SecretMap {
 	return &services.SecretMap{}
 }
+
+//InitConfigMapMap 初始化Secret存储Map
+func (m *K8sMaps) InitConfigMapMap() *services.ConfigMap {
+	return &services.ConfigMap{}
+}

@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"go_vue_k8s_admin/src/helpers"
 	"sort"
 	"sync"
 
@@ -465,4 +466,98 @@ func (m *SecretMap) ListAll(ns string) []*corev1.Secret {
 		return secretList
 	}
 	return nil
+}
+
+type cm struct {
+	cmdata *corev1.ConfigMap
+	md5    string //对cm的data进行md5存储，防止过度更新
+}
+
+func newcm(c *corev1.ConfigMap) *cm {
+	return &cm{
+		cmdata: c, //原始对象
+		md5:    helpers.Md5Data(c.Data),
+	}
+}
+
+type CoreV1ConfigMap []*cm
+
+func (m CoreV1ConfigMap) Len() int {
+	return len(m)
+}
+
+func (m CoreV1ConfigMap) Less(i, j int) bool {
+	//根据时间排序    倒排序
+	return m[i].cmdata.CreationTimestamp.Time.After(m[j].cmdata.CreationTimestamp.Time)
+}
+
+func (m CoreV1ConfigMap) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+type ConfigMap struct {
+	// namespace:[]*cm
+	data sync.Map
+}
+
+// Add 添加ConfigMap
+func (m *ConfigMap) Add(item *corev1.ConfigMap) {
+	if list, ok := m.data.Load(item.Namespace); ok {
+		list = append(list.([]*cm), newcm(item))
+		m.data.Store(item.Namespace, list)
+	} else {
+		m.data.Store(item.Namespace, []*cm{newcm(item)})
+	}
+}
+
+//Update 返回值是true或false，true代表有值更新了，否则返回false
+func (m *ConfigMap) Update(item *corev1.ConfigMap) bool {
+	if list, ok := m.data.Load(item.Namespace); ok {
+		for i, range_item := range list.([]*cm) {
+			//这里做判断，如果没变化就不做更新
+			if range_item.cmdata.Name == item.Name && !helpers.CmIsEq(range_item.cmdata.Data, item.Data) {
+				list.([]*cm)[i] = newcm(item)
+				return true //代表有值更新了
+			}
+		}
+	}
+	return false
+}
+
+// Delete 删除ConfigMap
+func (m *ConfigMap) Delete(svc *corev1.ConfigMap) {
+	if list, ok := m.data.Load(svc.Namespace); ok {
+		for i, v := range list.([]*cm) {
+			if v.cmdata.Name == svc.Name {
+				newList := append(list.([]*cm)[:i], list.([]*cm)[i+1:]...)
+				m.data.Store(svc.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+// Get 获取单个ConfigMap
+func (m *ConfigMap) Get(ns string, name string) *corev1.ConfigMap {
+	if items, ok := m.data.Load(ns); ok {
+		for _, item := range items.([]*cm) {
+			if item.cmdata.Name == name {
+				return item.cmdata
+			}
+		}
+	}
+	return nil
+}
+
+// ListAll 获取ConfigMap列表
+func (m *ConfigMap) ListAll(ns string) []*corev1.ConfigMap {
+	var ret []*corev1.ConfigMap
+	if list, ok := m.data.Load(ns); ok {
+		newList := list.([]*cm)
+		sort.Sort(CoreV1ConfigMap(newList)) //  按时间倒排序
+		for _, cm := range newList {
+			ret = append(ret, cm.cmdata)
+		}
+	}
+	return ret
 }

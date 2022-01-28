@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"go_vue_k8s_admin/src/helpers"
+	"go_vue_k8s_admin/src/models"
 	"go_vue_k8s_admin/src/wscore"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -13,8 +14,9 @@ import (
 )
 
 type WsCtl struct {
-	Client *kubernetes.Clientset `inject:"-"`
-	Config *rest.Config          `inject:"-"`
+	Client    *kubernetes.Clientset `inject:"-"`
+	Config    *rest.Config          `inject:"-"`
+	SysConfig *models.SysConfig     `inject:"-"`
 }
 
 func NewWsCtl() *WsCtl {
@@ -54,9 +56,30 @@ func (ctl *WsCtl) PodConnect(c *gin.Context) (v goft.Void) {
 	return
 }
 
+func (ctl *WsCtl) NodeConnect(c *gin.Context) (v goft.Void) {
+	nodeName := c.Query("node")
+	nodeConfig := helpers.GetNodeConfig(ctl.SysConfig, nodeName) //读取配置文件
+	wsClient, err := wscore.Upgrader.Upgrade(c.Writer, c.Request, nil)
+	goft.Error(err)
+	shellClient := wscore.NewWsShellClient(wsClient)
+	//session, err := helpers.SSHConnect(helpers.TempSSHUser,  helpers.TempSSHPWD, helpers.TempSSHIP ,22 )
+	session, err := helpers.SSHConnect(nodeConfig.User, nodeConfig.Pass, nodeConfig.Ip, 22)
+	goft.Error(err)
+	defer session.Close()
+	session.Stdout = shellClient
+	session.Stderr = shellClient
+	session.Stdin = shellClient
+	err = session.RequestPty("xterm-256color", 300, 500, helpers.NodeShellModes)
+	goft.Error(err)
+	err = session.Run("sh")
+	goft.Error(err)
+	return
+}
+
 func (ctl *WsCtl) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/ws", ctl.Connect)
 	goft.Handle("GET", "/podws", ctl.PodConnect)
+	goft.Handle("GET", "/nodews", ctl.NodeConnect)
 }
 func (ctl *WsCtl) Name() string {
 	return "WsCtl"

@@ -42,3 +42,7 @@ func (h *K8sHandler) SecretHandler() *services.SecretHandler {
 func (h *K8sHandler) ConfigMapHandler() *services.ConfigMapHandler {
 	return &services.ConfigMapHandler{}
 }
+
+func (h *K8sHandler) NodeHandler() *services.NodeHandler {
+	return &services.NodeHandler{}
+}

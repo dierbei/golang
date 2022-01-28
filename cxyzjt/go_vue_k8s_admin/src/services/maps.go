@@ -170,6 +170,20 @@ func (m *PodMap) Delete(pod *corev1.Pod) {
 	}
 }
 
+// GetNum 获取节点Pod数量
+func (m *PodMap) GetNum(nodeName string) int {
+	var count int
+	m.data.Range(func(key, value interface{}) bool {
+		for _, v := range value.([]*corev1.Pod) {
+			if v.Spec.NodeName == nodeName {
+				count++
+			}
+		}
+		return true
+	})
+	return count
+}
+
 // ListByNS 根据命名空间查询Deployment列表
 func (m *PodMap) ListByNS(ns string) []*corev1.Pod {
 	if list, ok := m.data.Load(ns); ok {
@@ -571,5 +585,44 @@ func (m *ConfigMap) ListAll(ns string) []*corev1.ConfigMap {
 			ret = append(ret, cm.cmdata)
 		}
 	}
+	return ret
+}
+
+type NodeMap struct {
+	// nodename:*v1.Node
+	data sync.Map
+}
+
+// Add 添加Node
+func (m *NodeMap) Add(item *corev1.Node) {
+	m.data.Store(item.Name, item)
+}
+
+// Update 更新Node
+func (m *NodeMap) Update(item *corev1.Node) bool {
+	m.data.Store(item.Name, item)
+	return true
+}
+
+// Delete 删除Node
+func (m *NodeMap) Delete(node *corev1.Node) {
+	m.data.Delete(node.Name)
+}
+
+// Get 获取Node
+func (m *NodeMap) Get(name string) *corev1.Node {
+	if node, ok := m.data.Load(name); ok {
+		return node.(*corev1.Node)
+	}
+	return nil
+}
+
+// ListAll 获取所有Node
+func (m *NodeMap) ListAll() []*corev1.Node {
+	var ret []*corev1.Node
+	m.data.Range(func(key, value interface{}) bool {
+		ret = append(ret, value.(*corev1.Node))
+		return true
+	})
 	return ret
 }

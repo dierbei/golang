@@ -30,8 +30,19 @@ func (ctl *PodCtl) GetAll(ctx *gin.Context) goft.Json {
 	}
 }
 
+func (ctl *PodCtl) Containers(c *gin.Context) goft.Json {
+	ns := c.DefaultQuery("ns", "default")
+	podname := c.DefaultQuery("name", "")
+	return gin.H{
+		"code": 20000,
+		"data": ctl.PodSvc.GetPodContainer(ns, podname),
+	}
+
+}
+
 func (ctl *PodCtl) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/pods", ctl.GetAll)
+	goft.Handle("GET", "/pods/containers", ctl.Containers)
 }
 
 func (ctl *PodCtl) Name() string {

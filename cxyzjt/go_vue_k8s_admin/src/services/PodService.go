@@ -52,3 +52,16 @@ func (svc *PodService) PagePods(ns string, page, size int) *ItemsPage {
 		size,
 		ipods).SetExt(gin.H{"ReadyNum": readyCount, "AllNum": allCount})
 }
+
+func (svc *PodService) GetPodContainer(ns, podname string) []*models.ContainerModel {
+	ret := make([]*models.ContainerModel, 0)
+	pod := svc.PodMap.Get(ns, podname)
+	if pod != nil {
+		for _, c := range pod.Spec.Containers {
+			ret = append(ret, &models.ContainerModel{
+				Name: c.Name,
+			})
+		}
+	}
+	return ret
+}

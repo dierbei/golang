@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"k8s.io/client-go/tools/clientcmd"
 	"log"
 
 	"go_vue_k8s_admin/src/services"
@@ -26,12 +27,18 @@ func NewK8sConfig() *K8sConfig {
 	return &K8sConfig{}
 }
 
+func (*K8sConfig) K8sRestConfig() *rest.Config {
+	config, err := clientcmd.BuildConfigFromFlags("", "config")
+	config.Insecure = true
+	if err != nil {
+		log.Fatal(err)
+	}
+	return config
+}
+
 // InitClient 初始化K8s客户端
 func (cfg *K8sConfig) InitClient() *kubernetes.Clientset {
-	config := &rest.Config{
-		Host: "http://175.24.198.168:8009",
-	}
-	c, err := kubernetes.NewForConfig(config)
+	c, err := kubernetes.NewForConfig(cfg.K8sRestConfig())
 	if err != nil {
 		log.Fatal(err)
 	}

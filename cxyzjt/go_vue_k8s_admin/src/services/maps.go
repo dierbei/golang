@@ -117,8 +117,20 @@ func (c CoreV1Pods) Swap(i, j int) {
 }
 
 type PodMap struct {
-	// namespace:[]*v1.Pod
+	// namespace:[]*corev1.Pod
 	data sync.Map
+}
+
+// Get 获取Pod
+func (m *PodMap) Get(ns string, name string) *corev1.Pod {
+	if list, ok := m.data.Load(ns); ok {
+		for _, v := range list.([]*corev1.Pod) {
+			if v.Name == name {
+				return v
+			}
+		}
+	}
+	return nil
 }
 
 // Add 添加Pod

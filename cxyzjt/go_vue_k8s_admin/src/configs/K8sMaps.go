@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"go_vue_k8s_admin/pkg/rbac"
 	"go_vue_k8s_admin/src/services"
 
 	"k8s.io/client-go/kubernetes"
@@ -57,4 +58,14 @@ func (m *K8sMaps) InitConfigMapMap() *services.ConfigMap {
 //InitNodeMapMap 初始化Node存储Map
 func (m *K8sMaps) InitNodeMapMap() *services.NodeMap {
 	return &services.NodeMap{}
+}
+
+//InitRoleMapMap 初始化Role存储Map
+func (m *K8sMaps) InitRoleMapMap() *rbac.RoleMap {
+	return &rbac.RoleMap{}
+}
+
+//InitRoleBindingMapMap 初始化Role存储Map
+func (m *K8sMaps) InitRoleBindingMapMap() *rbac.RoleBindingMap {
+	return &rbac.RoleBindingMap{}
 }

@@ -1,6 +1,9 @@
 package configs
 
-import "go_vue_k8s_admin/src/services"
+import (
+	"go_vue_k8s_admin/pkg/rbac"
+	"go_vue_k8s_admin/src/services"
+)
 
 type ServiceConfig struct{}
 
@@ -38,4 +41,8 @@ func (*ServiceConfig) ConfigMapService() *services.ConfigMapService {
 
 func (*ServiceConfig) NodeService() *services.NodeService {
 	return services.NewNodeService()
+}
+
+func (*ServiceConfig) RoleService() *rbac.RoleService {
+	return rbac.NewRoleService()
 }

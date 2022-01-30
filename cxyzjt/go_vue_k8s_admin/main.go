@@ -1,9 +1,11 @@
 package main
 
 import (
+	"go_vue_k8s_admin/pkg/resource"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go_vue_k8s_admin/pkg/rbac"
 	"go_vue_k8s_admin/src/configs"
 	"go_vue_k8s_admin/src/controllers"
 
@@ -29,6 +31,8 @@ func main() {
 			controllers.NewConfigMapCtl(),
 			controllers.NewPodLogsCtl(),
 			controllers.NewNodeCtl(),
+			rbac.NewRBACCtl(),
+			resource.NewResourcesCtl(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

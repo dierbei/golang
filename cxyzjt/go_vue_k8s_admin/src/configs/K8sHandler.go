@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"go_vue_k8s_admin/pkg/rbac"
 	"go_vue_k8s_admin/src/services"
 )
 
@@ -45,4 +46,12 @@ func (h *K8sHandler) ConfigMapHandler() *services.ConfigMapHandler {
 
 func (h *K8sHandler) NodeHandler() *services.NodeHandler {
 	return &services.NodeHandler{}
+}
+
+func (h *K8sHandler) RoleHandler() *rbac.RoleHandler {
+	return &rbac.RoleHandler{}
+}
+
+func (h *K8sHandler) RoleBindingHandler() *rbac.RoleBindingHandler {
+	return &rbac.RoleBindingHandler{}
 }

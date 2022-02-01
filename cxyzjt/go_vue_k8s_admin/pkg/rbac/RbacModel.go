@@ -17,3 +17,15 @@ type RoleBindingModel struct {
 	Subject    []rbacv1.Subject //包含了 绑定用户 数据
 	RoleRef    rbacv1.RoleRef
 }
+
+//UserAccount 模型
+type UAModel struct {
+	Name       string
+	CreateTime string
+}
+
+//提交用户时的对象模型
+type PostUAModel struct {
+	CN string `json:"cn" binding:"required,min=2"`
+	O  string `json:"o"`
+}

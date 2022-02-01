@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go_vue_k8s_admin/pkg/deployment"
 	"go_vue_k8s_admin/pkg/resource"
 	"net/http"
 
@@ -33,6 +34,7 @@ func main() {
 			controllers.NewNodeCtl(),
 			rbac.NewRBACCtl(),
 			resource.NewResourcesCtl(),
+			deployment.NewDeploymentCtlV2(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

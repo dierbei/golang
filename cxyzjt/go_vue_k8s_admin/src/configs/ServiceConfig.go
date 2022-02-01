@@ -46,3 +46,7 @@ func (*ServiceConfig) NodeService() *services.NodeService {
 func (*ServiceConfig) RoleService() *rbac.RoleService {
 	return rbac.NewRoleService()
 }
+
+func (*ServiceConfig) ServiceAccountService() *rbac.ServiceAccountService {
+	return rbac.NewSaService()
+}

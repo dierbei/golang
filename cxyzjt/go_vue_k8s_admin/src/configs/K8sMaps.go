@@ -65,7 +65,22 @@ func (m *K8sMaps) InitRoleMapMap() *rbac.RoleMap {
 	return &rbac.RoleMap{}
 }
 
-//InitRoleBindingMapMap 初始化Role存储Map
+//InitRoleBindingMapMap 初始化RoleBinding存储Map
 func (m *K8sMaps) InitRoleBindingMapMap() *rbac.RoleBindingMap {
 	return &rbac.RoleBindingMap{}
+}
+
+//InitServiceAccountMapMap 初始化ServiceAccount存储Map
+func (m *K8sMaps) InitServiceAccountMapMap() *rbac.ServiceAccountMap {
+	return &rbac.ServiceAccountMap{}
+}
+
+//InitClusterRoleMapMap 初始化ClusterRole存储Map
+func (m *K8sMaps) InitClusterRoleMapMap() *rbac.ClusterRoleMap {
+	return &rbac.ClusterRoleMap{}
+}
+
+//InitClusterRoleBindingMapMap 初始化ClusterRoleBinding存储Map
+func (m *K8sMaps) InitClusterRoleBindingMapMap() *rbac.ClusterRoleBindingMap {
+	return &rbac.ClusterRoleBindingMap{}
 }

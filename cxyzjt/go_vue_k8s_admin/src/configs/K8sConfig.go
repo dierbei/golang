@@ -18,17 +18,20 @@ import (
 )
 
 type K8sConfig struct {
-	DeployHandler      *services.DeployHandler    `inject:"-"`
-	PodHandler         *services.PodHandler       `inject:"-"`
-	NameHandler        *services.NameSpaceHandler `inject:"-"`
-	EventHandler       *services.EventHandler     `inject:"-"`
-	IngressHandler     *services.IngressHandler   `inject:"-"`
-	ServiceHandler     *services.ServiceHandler   `inject:"-"`
-	SecretHandler      *services.SecretHandler    `inject:"-"`
-	ConfigMapHandler   *services.ConfigMapHandler `inject:"-"`
-	NodeHandler        *services.NodeHandler      `inject:"-"`
-	RoleHandler        *rbac.RoleHandler          `inject:"-"`
-	RoleBindingHandler *rbac.RoleBindingHandler   `inject:"-"`
+	DeployHandler             *services.DeployHandler         `inject:"-"`
+	PodHandler                *services.PodHandler            `inject:"-"`
+	NameHandler               *services.NameSpaceHandler      `inject:"-"`
+	EventHandler              *services.EventHandler          `inject:"-"`
+	IngressHandler            *services.IngressHandler        `inject:"-"`
+	ServiceHandler            *services.ServiceHandler        `inject:"-"`
+	SecretHandler             *services.SecretHandler         `inject:"-"`
+	ConfigMapHandler          *services.ConfigMapHandler      `inject:"-"`
+	NodeHandler               *services.NodeHandler           `inject:"-"`
+	RoleHandler               *rbac.RoleHandler               `inject:"-"`
+	RoleBindingHandler        *rbac.RoleBindingHandler        `inject:"-"`
+	ServiceAccountHandler     *rbac.ServiceAccountHandler     `inject:"-"`
+	ClusterRoleHandler        *rbac.ClusterRoleHandler        `inject:"-"`
+	ClusterRoleBindingHandler *rbac.ClusterRoleBindingHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -91,6 +94,9 @@ func (cfg *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	factory.Core().V1().Nodes().Informer().AddEventHandler(cfg.NodeHandler)
 	factory.Rbac().V1().Roles().Informer().AddEventHandler(cfg.RoleHandler)
 	factory.Rbac().V1().RoleBindings().Informer().AddEventHandler(cfg.RoleBindingHandler)
+	factory.Core().V1().ServiceAccounts().Informer().AddEventHandler(cfg.ServiceAccountHandler)
+	factory.Rbac().V1().ClusterRoles().Informer().AddEventHandler(cfg.ClusterRoleHandler)
+	factory.Rbac().V1().ClusterRoleBindings().Informer().AddEventHandler(cfg.ClusterRoleBindingHandler)
 
 	factory.Start(wait.NeverStop)
 	return factory

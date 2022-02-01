@@ -55,3 +55,15 @@ func (h *K8sHandler) RoleHandler() *rbac.RoleHandler {
 func (h *K8sHandler) RoleBindingHandler() *rbac.RoleBindingHandler {
 	return &rbac.RoleBindingHandler{}
 }
+
+func (h *K8sHandler) ServiceAccountHandler() *rbac.ServiceAccountHandler {
+	return &rbac.ServiceAccountHandler{}
+}
+
+func (h *K8sHandler) ClusterRoleHandler() *rbac.ClusterRoleHandler {
+	return &rbac.ClusterRoleHandler{}
+}
+
+func (h *K8sHandler) ClusterRoleBindingHandler() *rbac.ClusterRoleBindingHandler {
+	return &rbac.ClusterRoleBindingHandler{}
+}

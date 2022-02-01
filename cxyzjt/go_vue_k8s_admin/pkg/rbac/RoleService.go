@@ -5,8 +5,10 @@ import (
 )
 
 type RoleService struct {
-	RoleMap        *RoleMap        `inject:"-"`
-	RoleBindingMap *RoleBindingMap `inject:"-"`
+	RoleMap               *RoleMap               `inject:"-"`
+	RoleBindingMap        *RoleBindingMap        `inject:"-"`
+	ClusterRoleMap        *ClusterRoleMap        `inject:"-"`
+	ClusterRoleBindingMap *ClusterRoleBindingMap `inject:"-"`
 }
 
 func NewRoleService() *RoleService {
@@ -55,4 +57,28 @@ func (svc *RoleService) GetRole(ns, name string) *rbacv1.Role {
 		panic("no such role")
 	}
 	return rb
+}
+
+func (svc *RoleService) ListClusterRoles() []*rbacv1.ClusterRole {
+	return svc.ClusterRoleMap.ListAll()
+}
+
+func (svc *RoleService) GetClusterRole(name string) *rbacv1.ClusterRole {
+	rb := svc.ClusterRoleMap.Get(name)
+	if rb == nil {
+		panic("no such cluster-role")
+	}
+	return rb
+}
+
+func (svc *RoleService) ListClusterRoleBindings() []*rbacv1.ClusterRoleBinding {
+	return svc.ClusterRoleBindingMap.ListAll()
+}
+
+func (svc *RoleService) GetClusterRoleBinding(name string) *rbacv1.ClusterRoleBinding {
+	crb := svc.ClusterRoleBindingMap.Get(name)
+	if crb == nil {
+		panic("no such clusterrolebinding")
+	}
+	return crb
 }

@@ -1,0 +1,6 @@
+k8s:
+  nodes:
+    - name: xiaolatiao1
+      ip: 175.24.198.168
+      user: xiaolatiao
+      pass: czc19990402.

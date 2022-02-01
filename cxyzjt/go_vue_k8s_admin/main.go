@@ -1,10 +1,14 @@
 package main
 
 import (
+	"go_vue_k8s_admin/pkg/deployment"
+	"go_vue_k8s_admin/pkg/resource"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"go_vue_k8s_admin/pkg/rbac"
 	"go_vue_k8s_admin/src/configs"
 	"go_vue_k8s_admin/src/controllers"
-	"net/http"
 
 	"github.com/shenyisyn/goft-gin/goft"
 )
@@ -21,6 +25,16 @@ func main() {
 			controllers.NewPodCtl(),
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),
+			controllers.NewNamespaceCtl(),
+			controllers.NewIngressCtl(),
+			controllers.NewSvcCtl(),
+			controllers.NewSecretCtl(),
+			controllers.NewConfigMapCtl(),
+			controllers.NewPodLogsCtl(),
+			controllers.NewNodeCtl(),
+			rbac.NewRBACCtl(),
+			resource.NewResourcesCtl(),
+			deployment.NewDeploymentCtlV2(),
 		).
 		//Attach(
 		//	middlewares.NewCrosMiddleware(),

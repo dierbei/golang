@@ -27,8 +27,8 @@ func (this *ClientMapStruct) Store(conn *websocket.Conn) {
 	// go wsClient.HandlerLoop() //处理 总控制循环
 }
 
-//向所有客户端 发送消息--发送deployment列表
-func (this *ClientMapStruct) SendAllDepList(v interface{}) {
+//SendAll 向所有客户端 发送消息--发送deployment列表
+func (this *ClientMapStruct) SendAll(v interface{}) {
 	this.data.Range(func(key, value interface{}) bool {
 		c := value.(*WsClient).conn
 		err := c.WriteJSON(v)

@@ -1,6 +1,9 @@
 package configs
 
-import "go_vue_k8s_admin/src/services"
+import (
+	"go_vue_k8s_admin/pkg/rbac"
+	"go_vue_k8s_admin/src/services"
+)
 
 type ServiceConfig struct{}
 
@@ -18,4 +21,32 @@ func (svc *ServiceConfig) DeploymentService() *services.DeploymentService {
 
 func (svc *ServiceConfig) PodService() *services.PodService {
 	return services.NewPodService()
+}
+
+func (*ServiceConfig) Helper() *services.Helper {
+	return services.NewHelper()
+}
+
+func (*ServiceConfig) IngressService() *services.IngressService {
+	return services.NewIngressService()
+}
+
+func (*ServiceConfig) SecretService() *services.SecretService {
+	return services.NewSecretService()
+}
+
+func (*ServiceConfig) ConfigMapService() *services.ConfigMapService {
+	return services.NewConfigMapService()
+}
+
+func (*ServiceConfig) NodeService() *services.NodeService {
+	return services.NewNodeService()
+}
+
+func (*ServiceConfig) RoleService() *rbac.RoleService {
+	return rbac.NewRoleService()
+}
+
+func (*ServiceConfig) ServiceAccountService() *rbac.ServiceAccountService {
+	return rbac.NewSaService()
 }

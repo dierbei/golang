@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gprodapi
+  namespace: myistio
+spec:
+  selector:
+    matchLabels:
+      app: gprod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gprod
+        version: v1
+    spec:
+      nodeName: xiaolatiao1
+      containers:
+        - name: gprodapi
+          image: alpine:3.12
+          imagePullPolicy: IfNotPresent
+          command: ["/app/gprods"]
+          volumeMounts:
+            - name: appdata
+              mountPath: /app
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: appdata
+          hostPath:
+            path: /home/xiaolatiao/istio/pro/build
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gprodsvc
+  namespace: myistio
+  labels:
+    app: gprod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: grpc
+  selector:
+    app: gprod

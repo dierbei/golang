@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: prods-gateway
+  namespace: myistio
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - prods.xiaolatiao.cn
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: prodinfo
+  namespace: myistio
+spec:
+  hosts:
+    - prods.xiaolatiao.cn
+  gateways:
+    - prods-gateway
+  http:
+  - match:
+    - uri:
+       prefix: /
+    route:
+    - destination:
+        host: prodsvc
+        port:
+          number: 80

@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = "istiopro/gsrc/pbfiles";
+message  ProdRequest {
+    int32 prod_id =1;   //传入的商品ID
+}
+//以下是商品相关
+message ProdModel {
+    int32 id=1;   //商品ID
+    string name=2;   //商品名称
+}
+//请求返回的结果
+message  ProdResponse {
+      ProdModel result=1;   //结果
+}

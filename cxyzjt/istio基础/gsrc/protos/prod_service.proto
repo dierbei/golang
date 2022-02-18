@@ -1,0 +1,6 @@
+syntax = "proto3";
+import "prod_model.proto";
+option go_package = "istiopro/gsrc/pbfiles";
+service ProdService {
+  rpc GetProd(ProdRequest) returns (ProdResponse);
+}

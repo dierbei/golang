@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prodapiv2
+  namespace: myistio
+spec:
+  selector:
+    matchLabels:
+      app: prod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prod
+        version: v2
+    spec:
+      nodeName: xiaolatiao1
+      containers:
+        - name: prodv2
+          image: alpine:3.12
+          imagePullPolicy: IfNotPresent
+          command: ["/app/prodsv2"]
+          env:
+            - name: "release"
+              value: "1"
+          volumeMounts:
+            - name: appdata
+              mountPath: /app
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: appdata
+          hostPath:
+            path: /home/xiaolatiao/istio/pro/build

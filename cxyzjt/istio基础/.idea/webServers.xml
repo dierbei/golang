@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="b2b8ac90-05aa-4e21-b186-4b551c492cba" name="istio_pro">
+        <fileTransfer rootFolder="/home/xiaolatiao" accessType="SFTP" host="175.24.198.168" port="22" sshConfigId="a33c2023-df15-4888-a441-092cae988b21" sshConfig="xiaolatiao@175.24.198.168:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

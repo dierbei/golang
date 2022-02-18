@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: grpc-gateway
+  namespace: myistio
+spec:
+  selector:
+    istio: grpc-ingressgateway # use Istio default gateway implementation
+  servers:
+    - port:
+        number: 80
+        name: grpc
+        protocol: GRPC
+      hosts:
+        - "*"

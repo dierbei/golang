@@ -1,0 +1,53 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-test
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  jwtRules:
+    # issuer  签发者
+    - issuer: "user@xiaolatiao.cn"
+      jwksUri: http://jwkapi/jwks
+      #      jwks: |
+      #        {
+      #            "keys": [
+      #                {
+      #                    "e":"AQAB",
+      #                    "kty":"RSA",
+      #                    "n":"tFLKvS2EMOu3vgPnUPkdn5xVau9-dWf0z30_EdbpadQLiVsHH0FqWl-8CgtNtxnUjrI6WN__BMX8jLzvEqKrdZnbTMS0EaTh8lfGbFxNd0qziVHlYZTH-gtPNI4r815y9OuY7DEuR8fG-B_iHuCslN3BcJ4TDF_tzKCF0USGzzEiiRPR4SBtZgz0tmteQgRTv1NfciOwCtedEtXRKnGI5W1GV5u2dmF6UCiWJdgsqHMsVzTXJz_wliVvKhczwhrFZfqvdBoOe_aays89AjcO4x7eUntZVvOlkowaD-UeUeT6ZL8q4oTWGpswA4YNJ_daZmtAU5ho11EW6F3q1YHjVQ"
+      #                 }
+      #            ]
+      #        }
+      forwardOriginalToken: true
+      outputPayloadToHeader: "Userinfo"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: prod-authpolicy
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  rules:
+    - from:
+        - source:
+            requestPrincipals: [ "*" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/prods/*" ]
+    - from:
+        - source:
+            requestPrincipals: [ "*" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/admin" ]
+      when:
+        - key: request.auth.claims[role]
+          values: [ "admin" ]

@@ -1,0 +1,39 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: prodvs
+  namespace: myistio
+spec:
+  hosts:
+    - pp.xiaolatiao.cn
+    - wx.xiaolatiao.cn
+    - prodsvc
+  gateways:
+    - pp-gateway
+    - mesh
+  http:
+    - match:
+        - uri:
+            prefix: "/p"
+      rewrite:
+        uri: "/prods"
+      route:
+        - destination:
+            host: prodsvc
+            port:
+              number: 80
+      corsPolicy:
+        allowOrigins:
+          - exact: "*"
+        allowMethods:
+          - GET
+          - POST
+          - PATCH
+          - PUT
+          - DELETE
+          - OPTIONS
+        allowCredentials: true
+        allowHeaders:
+          - authorization
+        maxAge: "24h"
+      timeout: 1s

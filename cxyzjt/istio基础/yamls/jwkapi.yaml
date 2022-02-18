@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jwkapi
+  namespace: myistio
+spec:
+  selector:
+    matchLabels:
+      app: jwkapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jwkapi
+        version: v1
+    spec:
+      nodeName: xiaolatiao1
+      containers:
+        - name: jwkapi
+          image: alpine:3.12
+          imagePullPolicy: IfNotPresent
+          workingDir: "/app"
+          command: ["./jwkapi"]
+          volumeMounts:
+            - name: appdata
+              mountPath: /app
+            - name: userpemfile
+              mountPath: /app/pubkeys/user.xiaolatiao.cn
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: appdata
+          hostPath:
+            path: /home/xiaolatiao/istio/pro/build
+        - name: userpemfile
+          secret:
+            secretName: user.xiaolatiao.cn
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jwkapi
+  namespace: myistio
+  labels:
+    app: jwkapi
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: jwkapi

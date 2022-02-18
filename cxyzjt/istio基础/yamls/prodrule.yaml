@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: prod-rule
+  namespace: myistio
+spec:
+  host: prodsvc
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+#      consistentHash:
+#        #httpHeaderName: myname
+#        useSourceIp: true
+#    connectionPool:
+#      tcp:
+#        maxConnections: 1
+#      http:
+#        http2MaxRequests: 1
+#        maxRequestsPerConnection: 1
+
+  subsets:
+    - name: v1svc
+      labels:
+        #version: v1
+        app: prod

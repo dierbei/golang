@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prodapi
+  namespace: myistio
+spec:
+  selector:
+    matchLabels:
+      app: prod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prod
+        version: v1
+    spec:
+      nodeName: xiaolatiao1
+      containers:
+        - name: prod
+          image: alpine:3.12
+          imagePullPolicy: IfNotPresent
+          command: ["/app/prods"]
+          env:
+            - name: "release"
+              value: "1"
+          volumeMounts:
+            - name: appdata
+              mountPath: /app
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: appdata
+          hostPath:
+            path: /home/xiaolatiao/istio/pro/build
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prodsvc
+  namespace: myistio
+  labels:
+    app: prod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: prod
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviewapi
+  namespace: myistio
+spec:
+  selector:
+    matchLabels:
+      app: reviews
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: reviews
+    spec:
+      nodeName: xiaolatiao1
+      containers:
+        - name: reviews
+          image: alpine:3.12
+          imagePullPolicy: IfNotPresent
+          command: ["/app/reviews"]
+          env:
+            - name: "release"
+              value: "1"
+          volumeMounts:
+            - name: appdata
+              mountPath: /app
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: appdata
+          hostPath:
+            path: /home/xiaolatiao/istio/pro/build
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviewsvc
+  namespace: myistio
+  labels:
+    app: review
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: reviews

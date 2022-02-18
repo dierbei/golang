@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mytest
+  namespace: myistio
+spec:
+  selector:
+    matchLabels:
+      app: mytest
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mytest
+    spec:
+      containers:
+        - name: mytest
+          image: nginx:1.18-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["sh","-c","echo this is alpine && sleep 36000"]
+

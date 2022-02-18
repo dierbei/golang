@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myngx
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: myngx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: myngx
+    spec:
+      containers:
+        - name: ngx1
+          image: nginx:1.18-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          env:
+            - name: myconf
+              value: $(config_value)
+

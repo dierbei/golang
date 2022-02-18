@@ -1,0 +1,6 @@
+
+namespace: bcd
+namePrefix: prod-
+bases:
+  - ../../base
+

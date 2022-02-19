@@ -12,7 +12,7 @@ func init() {
 
 	RootCmd.AddCommand(pingCMD)
 }
-//本课程来自程序员在囧途教育(www.jtthink.com)咨询群：98514334
+
 var pingCMD = &cobra.Command{
 	Use:   "ping",
 	Short: "ping一个地址",
